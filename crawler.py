@@ -10,9 +10,6 @@ from threading import Thread
 
 
 class DownloadThread(Thread):
-    """
-    Пример многопоточной загрузки файлов из интернета
-    """
 
     def __init__(self, urls, crawler, name, progressbar):
         """Инициализация потока"""
@@ -37,7 +34,7 @@ class DownloadThread(Thread):
             if not DownloadThread.uri_validator(url):
                 continue
             try:
-                content = requests.get(urllib.parse.unquote(url), timeout=2).content
+                content = requests.get(urllib.parse.unquote(url), timeout=5).content
             except:
                 continue
             self.crawler.save_image(url, content)
@@ -89,17 +86,10 @@ class Crawler:
                     bar.update(current_count % count)
 
                     page_number += 1
-        self.delete_bad_images()
 
     def save_image(self, url, content):
         with open(self.folder + '/' + str(hash(url)) + ".jpg", 'wb') as f:
             f.write(content)
-
-    def delete_bad_images(self, folder=0):
-        folder = folder or self.folder
-        for img in os.listdir(folder):
-            if str(type(cv2.imread(folder + '/' + img, 1))) == "<class 'NoneType'>":
-                os.remove(folder + '/' + img)
 
     @staticmethod
     def headers():
